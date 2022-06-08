@@ -53,8 +53,13 @@ header{
       margin-right: 10px;
       
     }
+    .headerCartBlock{
+      cursor: pointer;
+    }
     li{
       margin-right: 30px;
+      display: flex;
+      align-items: center;
     }
   }
 }
@@ -66,6 +71,9 @@ header{
   display: flex;
   justify-content: space-between;
   align-items: center;
+  .title{
+    word-break:break-all;
+  }
   img{
     margin-right: 12px;
   }
@@ -90,7 +98,8 @@ header{
 }
 .sneakers{
   display: flex;
-  justify-content: space-between;
+align-items: flex-end;
+ 
   flex-wrap: wrap;
 }
 .card{
@@ -143,10 +152,11 @@ header{
     font-size: 14px;
     color: #000;
     padding: 0 8px;
+    word-break:break-all;
     
   }
 }
-.button{
+ .img-button{
   background: #FFFFFF;
   border: 1px solid #e6e4e4;
   box-sizing: border-box;
@@ -155,8 +165,9 @@ header{
   width: 32px;
   cursor: pointer;
 }
+
 .overlay{
-  position: absolute ;
+  position: fixed ;
   left: 0;
   top: 0;
   width: 100%;
@@ -272,10 +283,13 @@ header{
     border: 1px solid #f0f0f0;
     border-radius: 20px;
     overflow: hidden;
-    
+    .cartContent{
+      display: flex;
+    }
     .cartInfo{
       margin: 0 21px;
       p{
+        word-break:break-all;
         font-weight: 500;
         font-size: 14px;
         line-height: 17px; 
