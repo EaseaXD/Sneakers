@@ -1,6 +1,6 @@
 
 import React from "react";
-const CartItem = ({imageUrl,title,price,id}) =>{
+const CartItem = ({imageUrl,title,price,id,onRemove}) =>{
     return(
       <div className='cartItem'>
       <div className="cartContent">
@@ -10,7 +10,7 @@ const CartItem = ({imageUrl,title,price,id}) =>{
           <b>{price} руб</b>
         </div>
       </div>
-    <img onClick={()=> console.log(id)} className='cartDelete' width={32} height={32} src='/img/delete.svg' alt='delete' />
+    <img onClick={()=> onRemove(id)} className='cartDelete' width={32} height={32} src='/img/delete.svg' alt='delete' />
     </div>
     )
 }

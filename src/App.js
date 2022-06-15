@@ -5,65 +5,109 @@ import Header from './components/Header';
 import Drawer from './components/Drawer';
 import React from 'react';
 import axios from 'axios';
+import Home from './pages/Home';
+import { Route, Routes } from 'react-router-dom';
+import Favorites from './pages/Favorites';
 
 
 function App() {
   const [cartOpened,setCartOpened] = React.useState(false);
   const[cartItems,setCartItems] =React.useState([]);
   const [sneakers,setSneakers] =React.useState([]);
+  const [favorites,setFavorites] = React.useState([]);
   const [searchValue,setSearchValue] = React.useState("");
-
+  const [sumCartheader,setSumCartHeader] = React.useState('');
   React.useEffect(() =>{
     axios.get("https://629f4eb7461f8173e4e69697.mockapi.io/items")
     .then((res)=>{
       
       setSneakers(res.data)
     })
+
+    axios.get("https://629f4eb7461f8173e4e69697.mockapi.io/cart")
+    .then((res)=>{
+      setCartItems(res.data)
+      
+    })
+    
+    axios.get("https://629f4eb7461f8173e4e69697.mockapi.io/favorites")
+    .then((res)=>{
+      setFavorites(res.data)
+      
+    })
+
   },[]);
 
   const onAddToCart = (obj) =>{
+    if(obj.isAdded === false){
+      console.log(obj.isAdded)
+    axios.post("https://629f4eb7461f8173e4e69697.mockapi.io/cart", obj)
+
     setCartItems(prev=> [...prev, obj])
+    }else{
+      setCartItems(prev =>[...prev])
+    }
+    
   };
+
+  const onRemoveItem = (id) =>{
+    axios.delete(`https://629f4eb7461f8173e4e69697.mockapi.io/cart/${id}`)
+    setCartItems((prev)=>  prev.filter(item => item.id !== id))
+    
+  }
+
+ 
+  
+  const AddtoFavorit = async (obj) =>{
+   console.log("App",obj.id)
+   try{
+    if(favorites.find(favObj => favObj.id === obj.id)){
+      axios.delete(`https://629f4eb7461f8173e4e69697.mockapi.io/favorites/${obj.id}`);
+      setFavorites((prev)=>  prev.filter(item => item.id !== obj.id))
+
+    }else if(favorites.some(item => item.id === obj.id) === false) {
+      const {data} = await axios.post("https://629f4eb7461f8173e4e69697.mockapi.io/favorites", obj,{
+        
+      })
+      console.log("add",obj)
+      setFavorites(prev=> [...prev, data])
+    }
+   }catch(error){
+    alert("не удалось добавить фаворитов ");
+   }
+    
+    
+    
+    
+  }
+
   const onChangeSearchInput = (event) =>{
     setSearchValue(event.target.value);
   }
+
+  const sumCart = (sum) =>{
+    setSumCartHeader(sum)
+  }
   return (
     <div className="wrapper">
-       {cartOpened? <Drawer items={cartItems} onClose={() => setCartOpened(!cartOpened)}  />: null}
-        <Header onClickCart={() => setCartOpened(!cartOpened)} />
+       {cartOpened? <Drawer items={cartItems} onClose={() => setCartOpened(!cartOpened)} onRemove={onRemoveItem} sumCart={sumCart}  />: null}
+        <Header onClickCart={() => setCartOpened(!cartOpened)} sumCartheader={sumCartheader} />
 
-        <div className='content'>
-
-          <div className='contentHeader'>
-          <h1 className='title'>{searchValue ? `Поиск по запросу: "${searchValue}"`: "Все кроссовки" }</h1>
-            <div className='search-block'>
-              <img src='/img/search.svg' alt='Search' />
-              <input onChange={onChangeSearchInput} value={searchValue} placeholder='Поиск...' />
-
-            </div>
-
-          </div>
-          
-
-          <div className='sneakers'>
-           {
-             sneakers.filter(item =>item.title.toLowerCase().includes(searchValue.toLowerCase())).map((item)=><Card 
-              id={item.id}
-              title={item.title}
-              price={item.price} 
-              imageUrl={item.imageUrl}
-              onClickFavorite={()=>alert('Добавили в закладки ')}
-              onPlus={(obj)=>onAddToCart(obj)}
-               />)
-           }
-            
-             
-
-             
-
-            </div>
-         
-        </div>
+        <Routes>
+          <Route path="/" element={
+            <Home 
+            searchValue={searchValue}
+            onChangeSearchInput={onChangeSearchInput}
+            sneakers={sneakers}
+            AddtoFavorit={AddtoFavorit}
+            onAddToCart={onAddToCart}
+            setSearchValue={setSearchValue}
+            />
+          } />
+           
+          <Route path='favorites' element={<Favorites favorites={favorites} AddtoFavorit={AddtoFavorit} />} />
+        </Routes>
+        
     </div>
   );
 }
